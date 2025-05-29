@@ -1,0 +1,115 @@
+classDiagram
+    class Card {
+        -string card_number
+        -string pin
+        -float balance
+        -bool history_enabled
+        -list transactions
+        -bool is_blocked
+        -string deposit_type
+        -float simulated_bank_account
+        -string owner_name
+        +__init__(card_number, pin, initial_balance, history_enabled, deposit_type, owner_name)
+        +check_pin(entered_pin) bool
+        +get_balance_as_string() string
+        +add_transaction(trans_type, amount) void
+        +get_history_as_string() string
+        +withdraw(amount, atm_cash_available) tuple
+        +deposit_cash(amount) tuple
+        +transfer_from_bank_account(amount_to_transfer) tuple
+    }
+
+    class DebitCard {
+        +__init__(card_number, pin, initial_balance, history_enabled, deposit_type, owner_name)
+        +withdraw(amount, atm_cash_available) tuple
+    }
+
+    class CreditCard {
+        -float credit_limit
+        +__init__(card_number, pin, initial_balance, credit_limit, history_enabled, deposit_type, owner_name)
+        -_apply_penalty_if_negative() void
+        +get_balance_as_string() string
+        +withdraw(amount, atm_cash_available) tuple
+        +deposit_cash(amount) tuple
+        +transfer_from_bank_account(amount_to_transfer) tuple
+    }
+
+    class ATM {
+        -Card current_card
+        -int pin_attempts
+        -float cash_in_atm
+        -list session_transactions_for_receipt
+        +__init__(initial_atm_cash)
+        +insert_card(card_object) tuple
+        +process_pin_entry(pin) tuple
+        +perform_withdrawal(amount_string) string
+        +perform_cash_deposit_to_card(amount_string) string
+        +perform_transfer_from_bank_to_card(amount_string) string
+        +request_card_balance() string
+        +request_card_history() string
+        +print_receipt(receipt_text) void
+        +cancel_operation_and_eject_card() string
+        -_eject_card_to_user() string
+        -_confiscate_card(reason) void
+    }
+
+    class ATMGUI {
+        -ATM atm
+        -dict cards
+        -Frame active_frame
+        -string pin_buffer
+        -StringVar selected_card_var
+        -StringVar pin_display_var
+        +__init__(atm_logic, card_database)
+        -_clear_screen() void
+        -_show_welcome_screen() void
+        -_handle_card_insertion() void
+        -_show_pin_entry_screen(initial_message) void
+        -_add_digit_to_pin(digit) void
+        -_clear_pin_entry() void
+        -_cancel_button_pressed_on_pin_screen() void
+        -_submit_pin_entry() void
+        -_show_main_menu() void
+        -_cancel_button_pressed_in_main_menu() void
+        -_create_amount_entry_screen(window_title, prompt_text, amount_processing_function) void
+        -_show_withdrawal_screen() void
+        -_show_deposit_screen() void
+        -_show_transfer_from_bank_screen() void
+        -_show_balance_screen() void
+        -_show_history_screen() void
+    }
+
+    %% Inheritance relationships
+    Card <|-- DebitCard : extends
+    Card <|-- CreditCard : extends
+    tk.Tk <|-- ATMGUI : extends
+
+    %% Association relationships
+    ATM o-- Card : uses
+    ATMGUI *-- ATM : contains
+    ATMGUI o-- Card : manages
+
+    %% Dependencies
+    ATM ..> Card : depends on
+    ATMGUI ..> Card : depends on
+
+    note for Card "Base class for all card types
+    Contains common card functionality
+    including balance, transactions,
+    and basic operations"
+    
+    note for DebitCard "Simple debit card
+    Cannot go below zero balance"
+    
+    note for CreditCard "Credit card with credit limit
+    Can have negative balance
+    Applies penalties for negative balance"
+    
+    note for ATM "Core ATM logic
+    Handles card operations,
+    cash management, and
+    transaction processing"
+    
+    note for ATMGUI "Tkinter-based GUI
+    Provides user interface
+    for ATM operations"
