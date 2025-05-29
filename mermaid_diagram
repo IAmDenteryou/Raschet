@@ -1,3 +1,4 @@
+```mermaid
 classDiagram
     class Card {
         -string card_number
@@ -113,3 +114,4 @@ classDiagram
     note for ATMGUI "Tkinter-based GUI
     Provides user interface
     for ATM operations"
+```
